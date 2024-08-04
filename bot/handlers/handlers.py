@@ -68,7 +68,7 @@ async def process_start_command(message: Message, state: FSMContext):
 @router.message(
     CommandStart(), StateFilter(StartForm.name, StartForm.birth_date)
 )
-async def process_start_command(message: Message, state: FSMContext):
+async def unprocess_start_command(message: Message, state: FSMContext):
     await delete_warning(message, LEXICON_RU["let_finish_form"])
 
 

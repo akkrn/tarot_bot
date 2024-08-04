@@ -1,5 +1,4 @@
 from aiogram.filters.state import State, StatesGroup
-from loader import redis_client
 
 
 class StartForm(StatesGroup):

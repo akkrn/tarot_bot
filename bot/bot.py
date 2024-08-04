@@ -22,7 +22,11 @@ async def main():
         level=logging.INFO,
         format="%(filename)s:%(lineno)d #%(levelname)-8s "
         "[%(asctime)s] - %(name)s - %(message)s",
-        # handlers=[RotatingFileHandler("bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8")],
+        handlers=[
+            RotatingFileHandler(
+                "bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
+            )
+        ],
     )
 
     logger.info("Starting bot")
@@ -45,3 +49,7 @@ if __name__ == "__main__":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     sentry_sdk.init(sentry_url)
     asyncio.run(main())
+
+
+# ClientOSError
+# send_mediafiles.py:44 #ERROR    [2024-08-03 17:38:47,532] - services.send_mediafiles - При отправке карты произошла ошибка: HTTP Client says - ClientOSError: [Errno 2] Can not write request body for https://api.telegram.org/bot7400704404:AAFmWn_QKG08Y7nQ_hSml2MzpyjnM4-uEDM/sendPhoto
