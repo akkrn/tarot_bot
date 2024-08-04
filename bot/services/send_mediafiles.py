@@ -15,7 +15,7 @@ async def send_file(
     user_tg_id: int,
     caption: str,
     above: bool = False,
-) -> Message:
+) -> Message: # TODO retry func to send file if ClientOSError
     """Send files to Telegam servers and collect file_id in Redis cache"""
     file_id = await get_file_id(redis_key)
     if file_id:
