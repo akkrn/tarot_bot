@@ -22,11 +22,11 @@ async def main():
         level=logging.INFO,
         format="%(filename)s:%(lineno)d #%(levelname)-8s "
         "[%(asctime)s] - %(name)s - %(message)s",
-        handlers=[
-            RotatingFileHandler(
-                "bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
-            )
-        ],
+        # handlers=[
+        #     RotatingFileHandler(
+        #         "bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
+        #     )
+        # ],
     )
 
     logger.info("Starting bot")
