@@ -42,6 +42,9 @@ max_tokens = int(config.promt_storage.max_tokens)
 # Files Paths
 images_path = config.files_paths.images_path
 
+# Proxy
+proxy_path = config.proxy.path
+
 # Telegram Bot
 bot = Bot(
     token=config.tg_bot.token,

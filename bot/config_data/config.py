@@ -4,6 +4,10 @@ from environs import Env
 
 
 @dataclass
+class Proxy:
+    path: int
+
+@dataclass
 class FilesPaths:
     images_path: str
 
@@ -63,6 +67,7 @@ class Config:
     redis_client: RedisClient
     promt_storage: PromtStorage
     files_paths: FilesPaths
+    proxy: Proxy
 
 
 def load_config(path: str | None) -> Config:
@@ -95,4 +100,5 @@ def load_config(path: str | None) -> Config:
             max_tokens=env.str("MAX_TOKENS"),
         ),
         files_paths=FilesPaths(images_path=env.str("IMAGES_PATH")),
+        proxy=Proxy(path=env.str("PROXY_PATH"))
     )
