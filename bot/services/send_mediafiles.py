@@ -1,15 +1,35 @@
+import asyncio
+
 from aiogram import Bot
 from aiogram.exceptions import TelegramAPIError
 from aiogram.types import FSInputFile, Message
 import logging
 
+from aiohttp import ClientOSError
 from services.redis import get_file_id, save_file_id, delete_file_id
 
 from exceptions import GifSendException
 
 logger = logging.getLogger(__name__)
 
+def retry_async(retries=3, delay=5):
+    """ Декоратор для повторной попытки выполнения асинхронной функции """
+    def wrapper(f):
+        async def wrapped_f(*args, **kwargs):
+            exc = None
+            for _ in range(retries):
+                try:
+                    return await f(*args, **kwargs)
+                except TelegramAPIError or ClientOSError as e:
+                    logger.error(f"Ошибка, повторная попытка: {e}")
+                    exc = e
+                    await asyncio.sleep(delay)
+            raise exc
+        return wrapped_f
+    return wrapper
 
+
+@retry_async(retries=3, delay=2)
 async def send_file(
     bot: Bot,
     file_path: str,
@@ -17,7 +37,7 @@ async def send_file(
     user_tg_id: int,
     caption: str,
     above: bool = False,
-) -> Message: # TODO retry func to send file if ClientOSError
+) -> Message:
     """Send files to Telegam servers and collect file_id in Redis cache"""
     file_id = await get_file_id(redis_key)
     if file_id:
