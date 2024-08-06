@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     CallbackQuery,
@@ -18,6 +19,7 @@ AMOUNT = [1, 1]
 
 
 async def build_payment_invoice(
+    bot: Bot,
     callback: CallbackQuery, state: FSMContext
 ) -> None:
     """Generate a payment invoice for a selected tarot card reading
@@ -56,7 +58,8 @@ async def build_payment_invoice(
     builder.button(text="Назад", callback_data="cancel")
     builder.adjust(1)
 
-    await callback.message.answer_invoice(
+    await bot.send_invoice(
+        chat_id=callback.from_user.id,
         title=title,
         description=description,
         prices=prices,
