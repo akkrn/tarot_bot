@@ -13,7 +13,7 @@ from services.openai import ask_openai
 from services.utils import parse_response, find_or_insert_newline
 
 from services.send_mediafiles import send_file, send_gif
-from exceptions import FailedParseResponseException
+from exceptions import FailedParseResponseException, GifSendException
 from loader import images_path
 
 from bot.lexicon.lexicon import LEXICON_RU
@@ -126,10 +126,10 @@ gifs_dict = {
 
 
 async def start_1_tarot(
-    bot: Bot,
-    session: AsyncSession,
-    question: str,
-    user: User,
+        bot: Bot,
+        session: AsyncSession,
+        question: str,
+        user: User,
 ):
     for _ in range(RETRY_ATTEMPTS):
         random_key = random.choice(list(gifs_dict.keys()))
@@ -143,7 +143,7 @@ async def start_1_tarot(
             continue
 
     async with ChatActionSender(
-        bot=bot, action="typing", chat_id=user.user_tg_id
+            bot=bot, action="typing", chat_id=user.user_tg_id
     ):
         img_name = random.choice(list(cards_list.keys()))
         readable_name = cards_list[img_name]
@@ -187,7 +187,7 @@ async def start_1_tarot(
 
 
 async def start_3_tarot(
-    bot: Bot, session: AsyncSession, question: str, user: User
+        bot: Bot, session: AsyncSession, question: str, user: User
 ):
     for _ in range(RETRY_ATTEMPTS):
         random_key = random.choice(list(gifs_dict.keys()))
@@ -202,7 +202,7 @@ async def start_3_tarot(
     if not gif_message:
         gif_message = await bot.send_message(user.user_tg_id, LEXICON_RU["no_gif"])
     async with ChatActionSender(
-        bot=bot, action="typing", chat_id=user.user_tg_id
+            bot=bot, action="typing", chat_id=user.user_tg_id
     ):
         keys = random.sample(list(cards_list.keys()), 3)
         selected_cards = {key: cards_list[key] for key in keys}
