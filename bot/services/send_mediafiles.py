@@ -5,6 +5,8 @@ import logging
 
 from services.redis import get_file_id, save_file_id, delete_file_id
 
+from exceptions import GifSendException
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,3 +64,5 @@ async def send_gif(
         return result
     except Exception as e:
         logger.error(f"При отправке карты произошла ошибка: {e}")
+        raise GifSendException
+

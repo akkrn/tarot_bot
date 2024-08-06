@@ -16,12 +16,14 @@ from services.send_mediafiles import send_file, send_gif
 from exceptions import FailedParseResponseException
 from loader import images_path
 
+from bot.lexicon.lexicon import LEXICON_RU
+
 logger = logging.getLogger(__name__)
 
 SHORT_SLEEP = 3
 MIDDLE_SLEEP = 5
 LONG_SLEEP = 12
-
+RETRY_ATTEMPTS = 3
 
 cards_list = {
     "01_The_Fool": "Шут",
@@ -129,11 +131,17 @@ async def start_1_tarot(
     question: str,
     user: User,
 ):
-    random_key = random.choice(list(gifs_dict.keys()))
-    random_value = gifs_dict[random_key]
-    gif_message = await send_gif(
-        bot, random_value, random_key, user.user_tg_id
-    )
+    for _ in range(RETRY_ATTEMPTS):
+        random_key = random.choice(list(gifs_dict.keys()))
+        random_value = gifs_dict[random_key]
+        try:
+            gif_message = await send_gif(
+                bot, random_value, random_key, user.user_tg_id
+            )
+            break
+        except GifSendException:
+            continue
+
     async with ChatActionSender(
         bot=bot, action="typing", chat_id=user.user_tg_id
     ):
@@ -181,11 +189,18 @@ async def start_1_tarot(
 async def start_3_tarot(
     bot: Bot, session: AsyncSession, question: str, user: User
 ):
-    random_key = random.choice(list(gifs_dict.keys()))
-    random_value = gifs_dict[random_key]
-    gif_message = await send_gif(
-        bot, random_value, random_key, user.user_tg_id
-    )
+    for _ in range(RETRY_ATTEMPTS):
+        random_key = random.choice(list(gifs_dict.keys()))
+        random_value = gifs_dict[random_key]
+        try:
+            gif_message = await send_gif(
+                bot, random_value, random_key, user.user_tg_id
+            )
+            break
+        except GifSendException:
+            continue
+    if not gif_message:
+        gif_message = await bot.send_message(user.user_tg_id, LEXICON_RU["no_gif"])
     async with ChatActionSender(
         bot=bot, action="typing", chat_id=user.user_tg_id
     ):
