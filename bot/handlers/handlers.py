@@ -153,23 +153,34 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
             try:
                 user = result.scalar_one()
                 if user.balance:
+                    loading_message = callback.answer(text=LEXICON_RU["wait_generate"])
                     if callback.data == "one_card":
                         balance = user.balance - 1
-                        await callback.message.delete()
-                        await start_1_tarot(bot, session, question, user)
+                        await asyncio.gather(
+                            callback.message.delete(),
+                            start_1_tarot(bot, session, question, user),
+                            bot.delete_message(user.user_tg_id, loading_message.message_id),
+                        )
                     elif callback.data == "three_card":
                         balance = user.balance - 1
-                        await callback.message.delete()
-                        await start_3_tarot(bot, session, question, user)
+                        await asyncio.gather(
+                            callback.message.delete(),
+                            start_3_tarot(bot, session, question, user),
+                            bot.delete_message(user.user_tg_id, loading_message.message_id),
+                        )
                     user.balance = balance
                     await session.commit()
                     await asyncio.sleep(15)
                 else:
-                    await state.set_state(AskState.payment)
-                    await build_payment_invoice(callback, state)
+                    loading_message = callback.answer(text=LEXICON_RU["wait_payment"])
+                    await asyncio.gather(
+                        state.set_state(AskState.payment),
+                        build_payment_invoice(callback, state),
+                        bot.delete_message(user.user_tg_id, loading_message.message_id),
+                    )
                     return
                 await state.set_state(AskState.question)
-                await callback.message.answer(
+                await callback.answer(
                     text=LEXICON_RU["ask_new_question"]
                 )
             except Exception as e:
