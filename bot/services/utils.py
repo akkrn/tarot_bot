@@ -1,3 +1,4 @@
+import asyncio
 import re
 from datetime import datetime
 import logging
@@ -120,3 +121,15 @@ def find_or_insert_newline(text: str) -> [str, str]:
         return text[: closest_newline + 1], text[closest_newline + 1 :]
     else:
         return text, "\n"
+
+
+async def calculate_reading_time(message: str) -> None:
+    """Calculate time for asyncio.sleep() based on length of text"""
+    chars_per_second = 60  # Скорость чтения в символах в секунду
+    reading_coefficient = (
+        1.15  # Коэффициент для добавления дополнительного времени
+    )
+    num_chars = len(message)
+    base_time = num_chars / chars_per_second
+    adjusted_time = base_time * reading_coefficient
+    await asyncio.sleep(adjusted_time)
