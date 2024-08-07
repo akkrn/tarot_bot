@@ -55,7 +55,7 @@ async def build_payment_invoice(
         logger.error("Unknown card type")
         return
 
-    builder.button(text="Назад", callback_data="cancel")
+    builder.button(text="Назад", callback_data="cancel_payment")
     builder.adjust(1)
 
     await bot.send_invoice(
