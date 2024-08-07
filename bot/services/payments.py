@@ -51,7 +51,7 @@ async def build_payment_invoice(
         payload = options["payload"]
         description = options["description"]
     else:
-        await send_to_admin(callback.message)
+        await send_to_admin(bot, callback.message.text, callback.from_user.id)
         logger.error("Unknown card type")
         return
 
