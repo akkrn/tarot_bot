@@ -15,6 +15,8 @@ from services.tarot import start_1_tarot, start_3_tarot
 
 from fsm_settings import AskState
 
+from services.payments import refund
+
 logger = logging.getLogger(__name__)
 
 router = Router()
@@ -73,6 +75,12 @@ async def on_successful_payment(
         await state.set_state(AskState.question)
         await message.answer(text=LEXICON_RU["ask_new_question"])
 
+
+@router.message(F.refunded_payment)
+async def on_refunded_payment(
+        message: Message,
+):
+    pass
 
 @router.message(Command("paysupport"))
 async def cmd_paysupport(

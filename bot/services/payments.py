@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from aiogram import Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     CallbackQuery,
@@ -19,8 +20,7 @@ AMOUNT = [1, 1]
 
 
 async def build_payment_invoice(
-    bot: Bot,
-    callback: CallbackQuery, state: FSMContext
+    bot: Bot, callback: CallbackQuery, state: FSMContext
 ) -> None:
     """Generate a payment invoice for a selected tarot card reading
     and sends it to the user with an option to pay."""
@@ -69,3 +69,22 @@ async def build_payment_invoice(
         reply_markup=builder.as_markup(),
     )
     await state.update_data(invoice_timestamp=int(datetime.now().timestamp()))
+
+
+async def refund(bot: Bot, user_id: int, payment_id: str):
+    if payment_id is None:
+        await bot.send_message(user_id, LEXICON_RU["no_payment_id"])
+        return
+    try:
+        await bot.refund_star_payment(
+            user_id=user_id, telegram_payment_charge_id=payment_id
+        )
+        await bot.send_message(user_id, LEXICON_RU["refund"])
+    except TelegramBadRequest as error:
+        if "CHARGE_NOT_FOUND" in error.message:
+            text = LEXICON_RU["refund_not_found"]
+        elif "CHARGE_ALREADY_REFUNDED" in error.message:
+            text = LEXICON_RU["refund_already_done"]
+        else:
+            text = LEXICON_RU["no_payment_id"]
+        await bot.send_message(user_id, text)
