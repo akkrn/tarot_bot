@@ -12,8 +12,10 @@ from exceptions import GifSendException
 
 logger = logging.getLogger(__name__)
 
+
 def retry_async(retries=3, delay=5):
-    """ Декоратор для повторной попытки выполнения асинхронной функции """
+    """Декоратор для повторной попытки выполнения асинхронной функции"""
+
     def wrapper(f):
         async def wrapped_f(*args, **kwargs):
             exc = None
@@ -25,7 +27,9 @@ def retry_async(retries=3, delay=5):
                     exc = e
                     await asyncio.sleep(delay)
             raise exc
+
         return wrapped_f
+
     return wrapper
 
 
@@ -85,4 +89,3 @@ async def send_gif(
     except Exception as e:
         logger.error(f"При отправке карты произошла ошибка: {e}")
         raise GifSendException
-
