@@ -4,3 +4,7 @@ class FailedParseResponseException(Exception):
 
 class GifSendException(Exception):
     pass
+
+
+class FailedOpenAIGenerateError(Exception):
+    pass

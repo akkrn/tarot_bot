@@ -19,6 +19,8 @@ from services.audio_transcribe import prepare_voice_message
 
 from lexicon.lexicon import LEXICON_RU
 
+from exceptions import FailedOpenAIGenerateError
+
 router = Router()
 logger = logging.getLogger(__name__)
 
@@ -153,36 +155,38 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
             try:
                 user = result.scalar_one()
                 if user.balance:
-                    loading_message = callback.answer(text=LEXICON_RU["wait_generate"])
+                    await callback.answer()
                     if callback.data == "one_card":
                         balance = user.balance - 1
-                        await asyncio.gather(
-                            callback.message.delete(),
-                            start_1_tarot(bot, session, question, user),
-                            bot.delete_message(user.user_tg_id, loading_message.message_id),
-                        )
+                        await callback.message.delete()
+                        try:
+                            await start_1_tarot(bot, session, question, user)
+                        except FailedOpenAIGenerateError:
+                            await callback.message.answer(text=LEXICON_RU["generate_error"])
+                            await state.set_state(AskState.question)
+                            await callback.message.answer(text=LEXICON_RU["new_question_after_error"])
+                            return
                     elif callback.data == "three_card":
                         balance = user.balance - 1
-                        await asyncio.gather(
-                            callback.message.delete(),
-                            start_3_tarot(bot, session, question, user),
-                            bot.delete_message(user.user_tg_id, loading_message.message_id),
-                        )
+                        await callback.message.delete()
+                        try:
+                            await start_3_tarot(bot, session, question, user)
+                        except FailedOpenAIGenerateError:
+                            await callback.message.answer(text=LEXICON_RU["generate_error"])
+                            await state.set_state(AskState.question)
+                            await callback.message.answer(text=LEXICON_RU["new_question_after_error"])
+                            return
                     user.balance = balance
                     await session.commit()
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(10)
+                    await state.set_state(AskState.question)
+                    await callback.message.answer(text=LEXICON_RU["ask_new_question"])
                 else:
-                    loading_message = callback.answer(text=LEXICON_RU["wait_payment"])
-                    await asyncio.gather(
-                        state.set_state(AskState.payment),
-                        build_payment_invoice(callback, state),
-                        bot.delete_message(user.user_tg_id, loading_message.message_id),
-                    )
+                    await callback.answer()
+                    await state.set_state(AskState.payment)
+                    await callback.message.delete()
+                    await build_payment_invoice(bot, callback, state)
                     return
-                await state.set_state(AskState.question)
-                await callback.answer(
-                    text=LEXICON_RU["ask_new_question"]
-                )
             except Exception as e:
                 logger.error(e)
     elif callback.data == "new_question":
