@@ -27,10 +27,10 @@ async def ask_openai(question: str, card_name: str | list) -> str:
 
     )
 
-    if isinstance(card_name, str):
+    if len(card_name) == 1:
         SYSTEM_PROMPT = user_1_card_promt
         prompt = f"Вопрос пользователя: {question}\nКарта: {card_name}"
-    elif isinstance(card_name, list):
+    elif len(card_name) == 3:
         SYSTEM_PROMPT = user_3_card_promt
         prompt = f"Вопрос пользователя: {question}\nКарта: {card_name[0]}\n"
     else:

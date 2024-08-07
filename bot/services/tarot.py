@@ -3,8 +3,10 @@ import datetime
 import random
 import logging
 import re
+from typing import List, Tuple, Optional
 
 from aiogram import Bot
+from aiogram.types import Message
 from aiogram.utils.chat_action import ChatActionSender
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +18,9 @@ from services.send_mediafiles import send_file, send_gif
 from exceptions import FailedParseResponseException, GifSendException
 from loader import images_path
 
-from bot.lexicon.lexicon import LEXICON_RU
+from exceptions import FailedOpenAIGenerateError
+from lexicon.lexicon import LEXICON_RU
+from services.utils import calculate_reading_time
 
 logger = logging.getLogger(__name__)
 
@@ -125,131 +129,112 @@ gifs_dict = {
 }
 
 
-async def start_1_tarot(
+async def send_gif_with_retry(bot: Bot, user_tg_id: int) -> Optional[Message]:
+    for _ in range(RETRY_ATTEMPTS):
+        random_key = random.choice(list(gifs_dict.keys()))
+        random_value = gifs_dict[random_key]
+        try:
+            return await send_gif(bot, random_value, random_key, user_tg_id)
+        except GifSendException:
+            continue
+    return await bot.send_message(user_tg_id, LEXICON_RU["no_gif"])
+
+
+async def generate_and_save_reading(
+        session: AsyncSession,
+        user: User,
+        question: str,
+        readable_names: List[str],
+        img_names: List[str],
+        bot: Bot,
+        gif_message: Message
+) -> Tuple[str, List[str], str, str]:
+    try:
+        response = await ask_openai(question, readable_names)
+    except Exception:
+        await bot.delete_message(user.user_tg_id, gif_message.message_id),
+        raise FailedOpenAIGenerateError
+
+    new_reading = Question(
+        user_id=user.id,
+        question=question,
+        answer=response,
+        cards=img_names,
+        added_at=datetime.datetime.now(),
+    )
+    session.add(new_reading)
+
+    try:
+        parsed = parse_response(response, len(readable_names))
+        card_descriptions = parsed[:-2]
+        interpretation, advice = parsed[-2:]
+    except FailedParseResponseException:
+        cleaned_text = re.sub(r"<[^>]*>", "", response)
+        card_descriptions = [""] * len(readable_names)
+        interpretation, advice = find_or_insert_newline(cleaned_text)
+
+    return response, card_descriptions, interpretation, advice
+
+
+async def send_cards_and_descriptions(
+        bot: Bot,
+        user_tg_id: int,
+        img_names: List[str],
+        readable_names: List[str],
+        card_descriptions: List[str],
+        gif_message: Message
+):
+    for index, (name, caption, card_desc) in enumerate(zip(img_names, readable_names, card_descriptions)):
+        file_path = f"{images_path}{name}.jpg"
+        if index == 0:
+            await asyncio.gather(
+                bot.delete_message(user_tg_id, gif_message.message_id),
+                send_file(bot, file_path, name, user_tg_id, caption, True),
+            )
+        else:
+            await send_file(bot, file_path, name, user_tg_id, caption, True)
+        await asyncio.sleep(MIDDLE_SLEEP)
+        if card_desc:
+            await bot.send_message(user_tg_id, card_desc)
+            await calculate_reading_time(card_desc)
+
+
+async def send_interpretation_and_advice(bot: Bot, user_tg_id: int, interpretation: str, advice: str):
+    await bot.send_message(user_tg_id, interpretation)
+    await calculate_reading_time(interpretation)
+    await bot.send_message(user_tg_id, advice)
+    await calculate_reading_time(advice)
+
+
+async def start_tarot(
         bot: Bot,
         session: AsyncSession,
         question: str,
         user: User,
+        num_cards: int
 ):
-    for _ in range(RETRY_ATTEMPTS):
-        random_key = random.choice(list(gifs_dict.keys()))
-        random_value = gifs_dict[random_key]
-        try:
-            gif_message = await send_gif(
-                bot, random_value, random_key, user.user_tg_id
-            )
-            break
-        except GifSendException:
-            continue
+    gif_message = await send_gif_with_retry(bot, user.user_tg_id)
 
-    async with ChatActionSender(
-            bot=bot, action="typing", chat_id=user.user_tg_id
-    ):
-        img_name = random.choice(list(cards_list.keys()))
-        readable_name = cards_list[img_name]
-
-        response = await ask_openai(question, readable_name)
-
-        new_reading = Question(
-            user_id=user.id,
-            question=question,
-            answer=response,
-            cards=[img_name],
-            added_at=datetime.datetime.now(),
-        )
-        session.add(new_reading)
-
-        try:
-            card_description, interpretation, advice = parse_response(
-                response, 1
-            )
-        except FailedParseResponseException:
-            cleaned_text = re.sub(r"<[^>]*>", "", response)
-            card_description = None
-            interpretation, advice = find_or_insert_newline(cleaned_text)
-        await asyncio.sleep(LONG_SLEEP)
-
-    file_path = f"{images_path}{img_name}.jpg"
-    await asyncio.gather(
-        bot.delete_message(user.user_tg_id, gif_message.message_id),
-        send_file(
-            bot, file_path, img_name, user.user_tg_id, readable_name, True
-        ),
-    )
-    await asyncio.sleep(SHORT_SLEEP)
-    if card_description:
-        await bot.send_message(user.user_tg_id, card_description)
-        await asyncio.sleep(MIDDLE_SLEEP)
-    await bot.send_message(user.user_tg_id, interpretation)
-    await asyncio.sleep(LONG_SLEEP)
-    await bot.send_message(user.user_tg_id, advice)
-    await asyncio.sleep(SHORT_SLEEP)
-
-
-async def start_3_tarot(
-        bot: Bot, session: AsyncSession, question: str, user: User
-):
-    for _ in range(RETRY_ATTEMPTS):
-        random_key = random.choice(list(gifs_dict.keys()))
-        random_value = gifs_dict[random_key]
-        try:
-            gif_message = await send_gif(
-                bot, random_value, random_key, user.user_tg_id
-            )
-            break
-        except GifSendException:
-            continue
-    if not gif_message:
-        gif_message = await bot.send_message(user.user_tg_id, LEXICON_RU["no_gif"])
-    async with ChatActionSender(
-            bot=bot, action="typing", chat_id=user.user_tg_id
-    ):
-        keys = random.sample(list(cards_list.keys()), 3)
+    async with ChatActionSender(bot=bot, action="typing", chat_id=user.user_tg_id):
+        keys = random.sample(list(cards_list.keys()), num_cards)
         selected_cards = {key: cards_list[key] for key in keys}
-
         img_names = list(selected_cards.keys())
         readable_names = list(selected_cards.values())
 
-        response = await ask_openai(question, readable_names)
-        new_reading = Question(
-            user_id=user.id,
-            question=question,
-            answer=response,
-            cards=img_names,
-            added_at=datetime.datetime.now(),
+        _, card_descriptions, interpretation, advice = await generate_and_save_reading(
+            session, user, question, readable_names, img_names, bot, gif_message
         )
-        session.add(new_reading)
-
-        try:
-            card_desc_1, card_desc_2, card_desc_3, interpretation, advice = (
-                parse_response(response, 3)
-            )
-            card_descriptions = [card_desc_1, card_desc_2, card_desc_3]
-        except FailedParseResponseException:
-            cleaned_text = re.sub(r"<[^>]*>", "", response)
-            card_descriptions = ["", "", ""]
-            interpretation, advice = find_or_insert_newline(cleaned_text)
         await asyncio.sleep(LONG_SLEEP)
-    for index, name in enumerate(img_names):
-        caption = selected_cards[name]
-        card_desc = card_descriptions[index]
-        file_path = f"{images_path}{name}.jpg"
-        if index == 0:
-            await asyncio.gather(
-                bot.delete_message(user.user_tg_id, gif_message.message_id),
-                send_file(
-                    bot, file_path, name, user.user_tg_id, caption, True
-                ),
-            )
-        else:
-            await send_file(
-                bot, file_path, name, user.user_tg_id, caption, True
-            )
-        await asyncio.sleep(MIDDLE_SLEEP)
-        if card_desc:
-            await bot.send_message(user.user_tg_id, card_desc)
-            await asyncio.sleep(MIDDLE_SLEEP)
-    await bot.send_message(user.user_tg_id, interpretation)
-    await asyncio.sleep(LONG_SLEEP)
-    await bot.send_message(user.user_tg_id, advice)
-    await asyncio.sleep(MIDDLE_SLEEP)
+
+    await send_cards_and_descriptions(
+        bot, user.user_tg_id, img_names, readable_names, card_descriptions, gif_message
+    )
+    await send_interpretation_and_advice(bot, user.user_tg_id, interpretation, advice)
+
+
+async def start_1_tarot(bot: Bot, session: AsyncSession, question: str, user: User):
+    await start_tarot(bot, session, question, user, 1)
+
+
+async def start_3_tarot(bot: Bot, session: AsyncSession, question: str, user: User):
+    await start_tarot(bot, session, question, user, 3)
