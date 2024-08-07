@@ -58,20 +58,39 @@ async def on_successful_payment(
             select(User).where(User.user_tg_id == message.from_user.id)
         )
         user = result.scalar_one()
+        payment_id = message.successful_payment.telegram_payment_charge_id
         new_payment = Payment(
             user_id=user.id,
-            payment_id=message.successful_payment.telegram_payment_charge_id,
+            payment_id=payment_id,
             invoice_payload=message.successful_payment.invoice_payload,
             total_amount=message.successful_payment.total_amount,
         )
         session.add(new_payment)
         bot = message.bot
         if message.successful_payment.invoice_payload == "1_card":
-            await start_1_tarot(bot, session, question, user)
+            try:
+                await start_1_tarot(bot, session, question, user)
+            except FailedOpenAIGenerateError:
+                await message.answer(text=LEXICON_RU["generate_error"])
+                await refund(bot, user.user_tg_id, payment_id)
+                new_payment.is_refunded = True
+                await session.commit()
+                await state.set_state(AskState.question)
+                await message.answer(text=LEXICON_RU["new_question_after_error"])
+                return
         elif message.successful_payment.invoice_payload == "3_card":
-            await start_3_tarot(bot, session, question, user)
+            try:
+                await start_3_tarot(bot, session, question, user)
+            except FailedOpenAIGenerateError:
+                await message.answer(text=LEXICON_RU["generate_error"])
+                await refund(bot, user.user_tg_id, payment_id)
+                new_payment.is_refunded = True
+                await session.commit()
+                await state.set_state(AskState.question)
+                await message.answer(text=LEXICON_RU["new_question_after_error"])
+                return
         else:
-            await send_to_admin(message)  # TODO Дополнить метод
+            await send_to_admin(bot, message.text, user.user_tg_id)
         await session.commit()
         await state.set_state(AskState.question)
         await message.answer(text=LEXICON_RU["ask_new_question"])
