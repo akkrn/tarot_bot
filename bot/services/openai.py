@@ -12,19 +12,21 @@ from loader import (
     user_1_card_promt,
     user_3_card_promt,
     max_tokens,
-    proxy_path
+    proxy_path,
 )
 
 logger = logging.getLogger(__name__)
 
 
-async def ask_openai(question: str, card_name: str | list) -> str:
+async def ask_openai(question: str, card_name: list) -> str:
     """Generate text by ChatGPT request"""
-    http_client = httpx.AsyncClient(proxies=proxy_path, transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"))
+    http_client = httpx.AsyncClient(
+        proxies=proxy_path,
+        transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"),
+    )
     client = AsyncOpenAI(
         api_key=openai_api_key,
         http_client=http_client,
-
     )
 
     if len(card_name) == 1:
@@ -46,16 +48,18 @@ async def ask_openai(question: str, card_name: str | list) -> str:
         )
         return chat_completion.choices[0].message.content
     except Exception as e:
-        logger.error(
-            f"Ошибка при запросе к GPT: {e}"
-        )
+        logger.error(f"Ошибка при запросе к GPT: {e}")
+        raise Exception
     finally:
         await http_client.aclose()
 
 
 async def transcribe_voice_message(file_path):
     """OpenAI Speech To Text request"""
-    http_client = httpx.AsyncClient(proxies=proxy_path, transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"))
+    http_client = httpx.AsyncClient(
+        proxies=proxy_path,
+        transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"),
+    )
 
     client = AsyncOpenAI(api_key=openai_api_key, http_client=http_client)
     try:
