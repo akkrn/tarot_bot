@@ -15,12 +15,14 @@ from lexicon.lexicon import LEXICON_RU
 
 logger = logging.getLogger(__name__)
 
-# AMOUNT = [50, 100]
-AMOUNT = [1, 1]
+AMOUNT = [50, 75]  # Prod
+
+
+# AMOUNT = [1, 1] # Debug
 
 
 async def build_payment_invoice(
-    bot: Bot, callback: CallbackQuery, state: FSMContext
+        bot: Bot, callback: CallbackQuery, state: FSMContext
 ) -> None:
     """Generate a payment invoice for a selected tarot card reading
     and sends it to the user with an option to pay."""
