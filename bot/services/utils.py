@@ -125,7 +125,7 @@ def find_or_insert_newline(text: str) -> [str, str]:
 
 async def calculate_reading_time(message: str) -> None:
     """Calculate time for asyncio.sleep() based on length of text"""
-    chars_per_second = 60  # Скорость чтения в символах в секунду
+    chars_per_second = 50  # Скорость чтения в символах в секунду
     reading_coefficient = (
         1.15  # Коэффициент для добавления дополнительного времени
     )
