@@ -15,6 +15,7 @@ from services.tarot import start_1_tarot, start_3_tarot
 
 from fsm_settings import AskState
 
+from exceptions import FailedOpenAIGenerateError
 from services.payments import refund
 
 logger = logging.getLogger(__name__)

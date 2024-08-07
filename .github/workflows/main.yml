@@ -21,10 +21,10 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd ${{ secrets.PATH_ON_SERVER }} 
-          git pull origin main
-          sudo docker-compose down
-          sudo docker-compose build
-          sudo docker-compose up -d
+          git pull origin master
+          sudo docker compose down
+          sudo docker compose build
+          sudo docker compose up -d
           sudo docker image prune -af
   notify:
     runs-on: ubuntu-latest
