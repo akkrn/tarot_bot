@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import BigInteger, TIMESTAMP, Enum
+from sqlalchemy import BigInteger, TIMESTAMP, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
@@ -28,7 +28,9 @@ class User(Base):
     status: Mapped[UserStatus] = mapped_column(
         Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False
     )
+    referrer_id: Mapped[int | None]
     added_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP)
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP)
 
     questions: Mapped[list["Question"]] = relationship(back_populates="user")
     payments: Mapped[list["Payment"]] = relationship(back_populates="user")
