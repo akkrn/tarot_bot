@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import datetime
 import logging
 
@@ -46,6 +47,7 @@ async def process_start_command(message: Message, state: FSMContext):
         )
         user = result.scalar_one_or_none()
         if not user:
+            link_args = command.args
             new_user = User(
                 user_tg_id=message.from_user.id,
                 username=message.from_user.username,
@@ -53,6 +55,24 @@ async def process_start_command(message: Message, state: FSMContext):
                 last_name=message.from_user.last_name,
                 added_at=datetime.datetime.now(),
             )
+            if link_args:
+                try:
+                    referrer_id = int(base64.urlsafe_b64decode(link_args).decode())
+                    result = await session.execute(
+                        select(User).where(User.user_tg_id == referrer_id)
+                    )
+                    referrer_user = result.scalar_one_or_none()
+                    if referrer_user:
+                        new_user.referrer_id = referrer_user.id
+                        bot = message.bot
+                        referrer_user.balance += 3
+                        try:
+                            message = LEXICON_RU["enter_new_friend"]
+                            await bot.send_message(referrer_id, message)
+                        except Exception as e:
+                            logger.error(f"Ошибка при отправлении сообщения рефералу, ошибка: {e}")
+                except Exception as e:
+                    logger.error(f"Ошибка при добавлении реферала, ошибка: {e}")
             session.add(new_user)
             await session.commit()
             await message.answer(text=LEXICON_RU["/start"])
@@ -72,6 +92,16 @@ async def process_start_command(message: Message, state: FSMContext):
 )
 async def unprocess_start_command(message: Message, state: FSMContext):
     await delete_warning(message, LEXICON_RU["let_finish_form"])
+
+
+@router.message(
+    Command('referral'), ~StateFilter(AskState.question)
+)
+async def process_referral_command(message: Message, state: FSMContext):
+    encoded_id = base64.urlsafe_b64encode(str(message.from_user.id).encode()).decode()
+    referral_link = (f"""🚀 Вот твоя персональная ссылка на приглашение:\n
+                <code>https://t.me/easy_refer_bot?start={encoded_id}</code>')""")
+    await message.answer(referral_link)
 
 
 @router.message(F.text.len() < 200, StateFilter(StartForm.name))
