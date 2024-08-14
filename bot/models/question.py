@@ -16,6 +16,8 @@ class Question(Base):
     question: Mapped[str | None] = mapped_column(TEXT)
     answer: Mapped[str | None] = mapped_column(TEXT)
     cards: Mapped[list | None] = mapped_column(ARRAY(String))
+    rating: Mapped[int | None]
+    link: Mapped[str | None]
     added_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP)
 
     user: Mapped["User"] = relationship(back_populates="questions")
