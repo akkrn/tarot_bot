@@ -72,7 +72,7 @@ async def on_successful_payment(
         bot = message.bot
         if message.successful_payment.invoice_payload == "1_card":
             try:
-                await start_1_tarot(bot, session, question, user)
+                question_id = await start_1_tarot(bot, session, question, user)
             except FailedOpenAIGenerateError:
                 await message.answer(text=LEXICON_RU["generate_error"])
                 await refund(bot, user.user_tg_id, payment_id)
@@ -83,7 +83,7 @@ async def on_successful_payment(
                 return
         elif message.successful_payment.invoice_payload == "3_card":
             try:
-                await start_3_tarot(bot, session, question, user)
+                question_id = await start_3_tarot(bot, session, question, user)
             except FailedOpenAIGenerateError:
                 await message.answer(text=LEXICON_RU["generate_error"])
                 await refund(bot, user.user_tg_id, payment_id)
@@ -96,6 +96,16 @@ async def on_successful_payment(
             await send_to_admin(bot, message.text, user.user_tg_id)
         await session.commit()
         await state.set_state(AskState.question)
+        keyboard = create_inline_kb(
+            2,
+            **{
+                f"thumb_up_{question_id}": "👍",
+                f"thumb_down_{question_id}": "👎",
+            },
+        )
+        await message.answer(
+            text=LEXICON_RU["feedback_please"], reply_markup=keyboard
+        )
         await asyncio.sleep(SHORT_SLEEP)
         await message.answer(text=LEXICON_RU["ask_new_question"])
 
