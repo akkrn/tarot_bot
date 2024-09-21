@@ -7,10 +7,10 @@ import sentry_sdk
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 from handlers import (
-    handlers,
     users_handlers,
     payments_handlers,
     admin_handlers,
+    other_handlers,
     tarot_handlers,
     form_handlers,
     command_handlers,
@@ -39,8 +39,8 @@ async def main():
     dp.include_router(users_handlers.router)
     dp.include_router(form_handlers.router)
     dp.include_router(admin_handlers.router)
-    dp.include_router(handlers.router)
     dp.include_router(tarot_handlers.router)
+    dp.include_router(other_handlers.router)
 
     # Автоматический ответ на необработанные колбеки, в данном случае нажатия не будут
     # крутиться песочные часы, что хорошо скажется на UI/UX
