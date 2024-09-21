@@ -35,7 +35,9 @@ async def ask_openai(question: str, card_name: list) -> str:
         prompt = f"Вопрос пользователя: {question}\nКарта: {card_name}"
     elif len(card_name) == 3:
         SYSTEM_PROMPT = user_3_card_promt
-        prompt = f"Вопрос пользователя: {question}\nКарта: {card_name[0]}\n"
+        prompt = (
+            f"Вопрос пользователя: {question}\nКарты: {', '.join(card_name)}\n"
+        )
     else:
         raise ValueError("card_name must be str or list")
     try:
