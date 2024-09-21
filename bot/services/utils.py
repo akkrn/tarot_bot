@@ -3,10 +3,11 @@ import re
 from datetime import datetime
 import logging
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from lexicon.lexicon import LEXICON_RU
 from exceptions import FailedParseResponseException
+from constants import SHORT_SLEEP
 
 logger = logging.getLogger(__name__)
 
@@ -141,3 +142,21 @@ async def delete_warning(message: Message, text: str) -> None:
     await asyncio.sleep(SHORT_SLEEP)
     await message.delete()
     await bot_message.delete()
+
+
+def create_pagination_keyboard(
+    current_page: int, total_pages: int
+) -> InlineKeyboardMarkup:
+    backward_button = "paginate_backward" if current_page > 1 else "no_action"
+    forward_button = (
+        "paginate_forward" if current_page < total_pages else "no_action"
+    )
+    current_page_text = f"{current_page}/{total_pages}"
+    return create_inline_kb(
+        width=3,
+        **{
+            backward_button: "⬅️",
+            "no_action": current_page_text,
+            forward_button: "➡️",
+        },
+    )
