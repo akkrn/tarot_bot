@@ -37,6 +37,7 @@ class AdminRights:
 @dataclass
 class OpenAIConfig:
     api_key: str
+    engine: str
 
 
 @dataclass
@@ -84,7 +85,9 @@ def load_config(path: str | None) -> Config:
             postgres_password=env("POSTGRES_PASSWORD"),
             db_port=env.int("DB_PORT"),
         ),
-        openai=OpenAIConfig(api_key=env("OPENAI_API_KEY")),
+        openai=OpenAIConfig(
+            api_key=env("OPENAI_API_KEY"), engine=env("OPENAI_ENGINE")
+        ),
         sentry=Sentry(url=env("SENTRY_URL")),
         admin_rights=AdminRights(
             owner_id=env.int("OWNER_ID"), admins_ids=env.list("ADMINS_IDS")

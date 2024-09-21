@@ -22,7 +22,7 @@ AMOUNT = [50, 75]  # Prod
 
 
 async def build_payment_invoice(
-        bot: Bot, callback: CallbackQuery, state: FSMContext
+    bot: Bot, callback: CallbackQuery, state: FSMContext
 ) -> None:
     """Generate a payment invoice for a selected tarot card reading
     and sends it to the user with an option to pay."""

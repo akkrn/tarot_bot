@@ -23,7 +23,7 @@ async_session = sessionmaker(
 )
 
 # Redis connection
-redis_client = redis.Redis(host="redis")
+redis_client = redis.Redis()
 
 # Monitoring & Exceptions
 sentry_url = config.sentry.url
@@ -34,6 +34,7 @@ admins_ids = [int(x) for x in config.admin_rights.admins_ids]
 
 # OpenAI Config
 openai_api_key = config.openai.api_key
+openai_engine = config.openai.engine
 user_1_card_promt = config.promt_storage.user_1_card_promt
 user_3_card_promt = config.promt_storage.user_3_card_promt
 max_tokens = int(config.promt_storage.max_tokens)

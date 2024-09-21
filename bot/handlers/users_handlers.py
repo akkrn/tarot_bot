@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram import F, Router
 from aiogram.filters.chat_member_updated import (
     ChatMemberUpdatedFilter,
@@ -21,7 +23,9 @@ async def user_blocked_bot(event: ChatMemberUpdated):
         stmt = (
             update(User)
             .where(User.user_tg_id == event.from_user.id)
-            .values(status=UserStatus.BANNED)
+            .values(
+                status=UserStatus.BANNED, updated_at=datetime.datetime.now()
+            )
         )
         await session.execute(stmt)
         await session.commit()
@@ -33,7 +37,9 @@ async def user_unblocked_bot(event: ChatMemberUpdated):
         stmt = (
             update(User)
             .where(User.user_tg_id == event.from_user.id)
-            .values(status=UserStatus.ACTIVE)
+            .values(
+                status=UserStatus.ACTIVE, updated_at=datetime.datetime.now()
+            )
         )
         await session.execute(stmt)
         await session.commit()

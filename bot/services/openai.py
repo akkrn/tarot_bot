@@ -9,6 +9,7 @@ from openai import AsyncOpenAI
 
 from loader import (
     openai_api_key,
+    openai_engine,
     user_1_card_promt,
     user_3_card_promt,
     max_tokens,
@@ -34,7 +35,9 @@ async def ask_openai(question: str, card_name: list) -> str:
         prompt = f"Вопрос пользователя: {question}\nКарта: {card_name}"
     elif len(card_name) == 3:
         SYSTEM_PROMPT = user_3_card_promt
-        prompt = f"Вопрос пользователя: {question}\nКарта: {card_name[0]}\n"
+        prompt = (
+            f"Вопрос пользователя: {question}\nКарты: {', '.join(card_name)}\n"
+        )
     else:
         raise ValueError("card_name must be str or list")
     try:
@@ -43,7 +46,7 @@ async def ask_openai(question: str, card_name: list) -> str:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            model="gpt-4o-mini",
+            model=openai_engine,
             max_tokens=max_tokens,
         )
         return chat_completion.choices[0].message.content
