@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import BigInteger, TIMESTAMP, Enum, ForeignKey
+from sqlalchemy import BigInteger, TIMESTAMP, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
