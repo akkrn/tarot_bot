@@ -11,6 +11,7 @@ from handlers import (
     users_handlers,
     payments_handlers,
     admin_handlers,
+    command_handlers,
 )
 from loader import bot, dp, sentry_url
 
@@ -31,6 +32,7 @@ async def main():
 
     logger.info("Starting bot")
 
+    dp.include_router(command_handlers.router)
     dp.include_router(payments_handlers.router)
     dp.include_router(users_handlers.router)
     dp.include_router(admin_handlers.router)
