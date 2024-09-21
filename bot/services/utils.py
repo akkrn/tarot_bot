@@ -133,3 +133,11 @@ async def calculate_reading_time(message: str) -> None:
     base_time = num_chars / chars_per_second
     adjusted_time = base_time * reading_coefficient
     await asyncio.sleep(adjusted_time)
+
+
+async def delete_warning(message: Message, text: str) -> None:
+    """Delete useless messages from user with warnings"""
+    bot_message = await message.answer(text=text)
+    await asyncio.sleep(SHORT_SLEEP)
+    await message.delete()
+    await bot_message.delete()
