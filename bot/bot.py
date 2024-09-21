@@ -11,6 +11,7 @@ from handlers import (
     users_handlers,
     payments_handlers,
     admin_handlers,
+    tarot_handlers,
     command_handlers,
 )
 from loader import bot, dp, sentry_url
@@ -37,6 +38,7 @@ async def main():
     dp.include_router(users_handlers.router)
     dp.include_router(admin_handlers.router)
     dp.include_router(handlers.router)
+    dp.include_router(tarot_handlers.router)
 
     # Автоматический ответ на необработанные колбеки, в данном случае нажатия не будут
     # крутиться песочные часы, что хорошо скажется на UI/UX
