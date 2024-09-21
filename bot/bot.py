@@ -12,6 +12,7 @@ from handlers import (
     payments_handlers,
     admin_handlers,
     tarot_handlers,
+    form_handlers,
     command_handlers,
 )
 from loader import bot, dp, sentry_url
@@ -36,6 +37,7 @@ async def main():
     dp.include_router(command_handlers.router)
     dp.include_router(payments_handlers.router)
     dp.include_router(users_handlers.router)
+    dp.include_router(form_handlers.router)
     dp.include_router(admin_handlers.router)
     dp.include_router(handlers.router)
     dp.include_router(tarot_handlers.router)
