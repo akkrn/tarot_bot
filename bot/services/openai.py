@@ -9,6 +9,7 @@ from openai import AsyncOpenAI
 
 from loader import (
     openai_api_key,
+    openai_engine,
     user_1_card_promt,
     user_3_card_promt,
     max_tokens,
@@ -43,7 +44,7 @@ async def ask_openai(question: str, card_name: list) -> str:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            model="gpt-4o-mini",
+            model=openai_engine,
             max_tokens=max_tokens,
         )
         return chat_completion.choices[0].message.content
