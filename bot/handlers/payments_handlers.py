@@ -17,6 +17,9 @@ from fsm_settings import AskState
 
 from exceptions import FailedOpenAIGenerateError
 from services.payments import refund
+from constants import INVOICE_LIFETIME_SECONDS, SHORT_SLEEP
+from services.utils import create_inline_kb
+
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +96,7 @@ async def on_successful_payment(
             await send_to_admin(bot, message.text, user.user_tg_id)
         await session.commit()
         await state.set_state(AskState.question)
+        await asyncio.sleep(SHORT_SLEEP)
         await message.answer(text=LEXICON_RU["ask_new_question"])
 
 
