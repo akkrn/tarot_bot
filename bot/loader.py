@@ -23,7 +23,7 @@ async_session = sessionmaker(
 )
 
 # Redis connection
-redis_client = redis.Redis()
+redis_client = redis.Redis(host="redis")
 
 # Monitoring & Exceptions
 sentry_url = config.sentry.url
