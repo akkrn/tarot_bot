@@ -11,7 +11,8 @@ from aiogram.utils.chat_action import ChatActionSender
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Question, User
-from services.openai import ask_openai
+#from services.openai import ask_openai
+from services.deepseek import ask_deepseek
 from services.utils import parse_response, find_or_insert_newline
 
 from services.send_mediafiles import send_file, send_gif
@@ -48,7 +49,7 @@ async def generate_and_save_reading(
     gif_message: Message,
 ) -> Tuple[Question, List[str], str, str]:
     try:
-        response = await ask_openai(question, readable_names)
+        response = await ask_deepseek(question, readable_names)
     except Exception:
         await bot.delete_message(user.user_tg_id, gif_message.message_id),
         raise FailedOpenAIGenerateError
