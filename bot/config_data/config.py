@@ -39,6 +39,10 @@ class OpenAIConfig:
     api_key: str
     engine: str
 
+@dataclass
+class DeepSeekConfig:
+    api_key: str
+    engine: str
 
 @dataclass
 class Sentry:
@@ -64,6 +68,7 @@ class Config:
     tg_bot: TgBot
     db: DatabaseConfig
     openai: OpenAIConfig
+    deepseek: DeepSeekConfig
     sentry: Sentry
     admin_rights: AdminRights
     redis_client: RedisClient
@@ -87,6 +92,9 @@ def load_config(path: str | None) -> Config:
         ),
         openai=OpenAIConfig(
             api_key=env("OPENAI_API_KEY"), engine=env("OPENAI_ENGINE")
+        ),
+        deepseek=DeepSeekConfig(
+            api_key=env("DEEPSEEK_API_KEY"), engine=env("DEEPSEEK_ENGINE")
         ),
         sentry=Sentry(url=env("SENTRY_URL")),
         admin_rights=AdminRights(

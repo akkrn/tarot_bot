@@ -45,7 +45,7 @@ async def on_pre_checkout_query(
     await pre_checkout_query.answer(ok=True)
 
 
-@router.message(F.successful_payment)
+@router.message(F.successful_payment) # TODO Сделать рефакторинг, чтобы не было двух одинаковых методов в двух разных местах
 async def on_successful_payment(
     message: Message,
     state: FSMContext,

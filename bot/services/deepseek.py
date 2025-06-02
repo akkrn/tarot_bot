@@ -5,12 +5,11 @@ import httpx
 from openai import AsyncOpenAI
 
 from loader import (
-    openai_api_key,
-    openai_engine,
+    deepseek_api_key,
+    deepseek_engine,
     user_1_card_promt,
     user_3_card_promt,
     max_tokens,
-    proxy_path,
 )
 
 logger = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ async def ask_deepseek(question: str, card_name: list) -> str:
         transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"),
     )
     client = AsyncOpenAI(
-        api_key=openai_api_key,
+        api_key=deepseek_api_key,
         http_client=http_client,
         base_url="https://api.deepseek.com",
     )
@@ -42,7 +41,7 @@ async def ask_deepseek(question: str, card_name: list) -> str:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            model=openai_engine,
+            model=deepseek_engine,
             max_tokens=max_tokens,
         )
         return chat_completion.choices[0].message.content

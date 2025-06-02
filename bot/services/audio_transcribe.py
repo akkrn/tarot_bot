@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from aiogram.types import Message
-from services.deepseek import transcribe_voice_message
+from services.openai import transcribe_voice_message
 from loader import images_path
 
 

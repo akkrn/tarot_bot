@@ -33,7 +33,10 @@ async def cmd_start(
             select(User).where(User.user_tg_id == message.from_user.id)
         )
         user = result.scalar_one_or_none()
-        if not user:
+        if not user: # TODO если в бд статус BANNED, то добавлять префикс для id пользователя, 
+            # чтобы при повторном запуске анкета была пустая
+            # но данные все равно сохранялись, либо сделать отдельную таблицу, где id пользователя не будет уникальным
+            # и переносить данные при бане бота в отдельную таблицу
             link_args = command.args
             new_user = User(
                 user_tg_id=message.from_user.id,

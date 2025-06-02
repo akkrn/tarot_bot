@@ -38,6 +38,12 @@ admins_ids = [int(x) for x in config.admin_rights.admins_ids]
 # OpenAI Config
 openai_api_key = config.openai.api_key
 openai_engine = config.openai.engine
+
+#DeepSeek Config
+deepseek_api_key = config.deepseek.api_key
+deepseek_engine = config.deepseek.engine
+
+
 user_1_card_promt = config.promt_storage.user_1_card_promt
 user_3_card_promt = config.promt_storage.user_3_card_promt
 max_tokens = int(config.promt_storage.max_tokens)
