@@ -1,10 +1,12 @@
 import os
 from datetime import datetime
+import logging
 
 from aiogram.types import Message
 from services.openai import transcribe_voice_message
 from loader import images_path
 
+logger = logging.getLogger(__name__)
 
 async def prepare_voice_message(message: Message) -> str | None:
     """Process a voice message, transcribe it to text, and return the transcribed text."""
@@ -16,8 +18,10 @@ async def prepare_voice_message(message: Message) -> str | None:
     await bot.download_file(file_info.file_path, file_ogg_path)
     try:
         if os.path.exists(file_ogg_path):
+            logger.debug(f"File: {file_name} exist")
             question = await transcribe_voice_message(file_ogg_path)
         else:
+            logger.error(f"File: {file_name} doesn't exist")
             question = None
     finally:
         if os.path.exists(file_ogg_path):

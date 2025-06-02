@@ -43,15 +43,15 @@ async def process_voice_question(message: Message, state: FSMContext):
         await delete_warning(message, LEXICON_RU["error_voice_transcribe"])
         return
     await message.answer(text=question)
-    # await state.update_data(question=question)
-    # keyboard = create_inline_kb(
-    #     2,
-    #     "one_card",
-    #     "three_card",
-    #     "new_question",
-    # )
-    # await message.answer(text=LEXICON_RU["choose_type"], reply_markup=keyboard)
-    # await state.set_state(AskState.choose_type)
+    await state.update_data(question=question)
+    keyboard = create_inline_kb(
+        2,
+        "one_card",
+        "three_card",
+        "new_question",
+    )
+    await message.answer(text=LEXICON_RU["choose_type"], reply_markup=keyboard)
+    await state.set_state(AskState.choose_type)
 
 
 @router.callback_query(

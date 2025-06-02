@@ -52,21 +52,21 @@ async def ask_deepseek(question: str, card_name: list) -> str:
         await http_client.aclose()
 
 
-async def transcribe_voice_message(file_path):
-    """OpenAI Speech To Text request"""
-    try:
-        model = whisper.load_model("small")
+# async def transcribe_voice_message(file_path):
+#     """OpenAI Speech To Text request"""
+#     try:
+#         model = whisper.load_model("small")
 
-        audio = whisper.load_audio(file_path)
-        audio = whisper.pad_or_trim(audio)
-        mel = whisper.log_mel_spectrogram(audio).to(model.device)
-        options = whisper.DecodingOptions(language='ru', without_timestamps = True, fp16 = False)
-        result = whisper.decode(model, mel, options)
+#         audio = whisper.load_audio(file_path)
+#         audio = whisper.pad_or_trim(audio)
+#         mel = whisper.log_mel_spectrogram(audio).to(model.device)
+#         options = whisper.DecodingOptions(language='ru', without_timestamps = True, fp16 = False)
+#         result = whisper.decode(model, mel, options)
 
-        #result = model.transcribe(file_path)
-        return result.text
-    except Exception as e:
-        logger.error(
-            f"При обработке голосового сообщения возникла ошибка: {e}"
-        )
+#         #result = model.transcribe(file_path)
+#         return result.text
+#     except Exception as e:
+#         logger.error(
+#             f"При обработке голосового сообщения возникла ошибка: {e}"
+#         )
 
