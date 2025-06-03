@@ -57,8 +57,9 @@ async def process_voice_question(message: Message, state: FSMContext):
 @router.callback_query(
     F.data.in_(["one_card", "three_card", "new_question"]),
     StateFilter(AskState.choose_type),
-) # TODO Сделать статус при ожидании, чтобы не было возможности задать новый, так можно задать несколько в перерыве 
+)
 async def process_choose_type(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(AskState.proccess)
     user_data = await state.get_data()
     question = user_data["question"]
     bot = callback.bot
@@ -135,3 +136,9 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
         await state.set_state(AskState.question)
         await callback.message.delete()
         await callback.message.answer(text=LEXICON_RU["let_ask_question"])
+
+
+@router.callback_query(StateFilter(AskState.proccess))
+@router.message(StateFilter(AskState.proccess))
+async def procces_tarot_message(message: Message):
+    await delete_warning(message, LEXICON_RU["proccess_tarot_message"])

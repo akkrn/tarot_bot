@@ -10,6 +10,7 @@ class AskState(StatesGroup):
     question = State()
     choose_type = State()
     payment = State()
+    proccess = State()
 
 
 class AdminState(StatesGroup):

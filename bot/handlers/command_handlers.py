@@ -97,7 +97,7 @@ async def cmd_referral(message: Message):
         str(message.from_user.id).encode()
     ).decode()
     bot_username = message.bot._me.username
-    referral_link = f"""🚀 Вот ваша персональная ссылка для приглашения друзей (Нажмите, чтобы скопировать):\n\n`https://t.me/{bot_username}?start={encoded_id}`"""
+    referral_link = LEXICON_RU["referral_link"] + f"`https://t.me/{bot_username}?start={encoded_id}`"
     await message.answer(referral_link)
 
 

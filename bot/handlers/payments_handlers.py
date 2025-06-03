@@ -50,6 +50,7 @@ async def on_successful_payment(
     message: Message,
     state: FSMContext,
 ):
+    await state.set_state(AskState.proccess)
     user_data = await state.get_data()
     question = user_data["question"]
     async with async_session() as session:
