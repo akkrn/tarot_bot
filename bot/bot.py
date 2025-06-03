@@ -22,15 +22,15 @@ logger = logging.getLogger(__name__)
 
 async def main():
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(filename)s:%(lineno)d %(levelname)-8s "
         "[%(asctime)s] - %(name)s - %(message)s",
         handlers=[
             RotatingFileHandler(
-                "bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
+                "logs/bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
             )
         ],
-    ) # TODO вынести логи в докер volume
+    )
 
     logger.info("Starting bot")
 
