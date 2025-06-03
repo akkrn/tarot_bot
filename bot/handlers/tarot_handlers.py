@@ -57,7 +57,7 @@ async def process_voice_question(message: Message, state: FSMContext):
 @router.callback_query(
     F.data.in_(["one_card", "three_card", "new_question"]),
     StateFilter(AskState.choose_type),
-)
+) # TODO Сделать статус при ожидании, чтобы не было возможности задать новый, так можно задать несколько в перерыве 
 async def process_choose_type(callback: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     question = user_data["question"]

@@ -8,7 +8,7 @@ from loader import images_path
 
 logger = logging.getLogger(__name__)
 
-async def prepare_voice_message(message: Message) -> str | None:
+async def prepare_voice_message(message: Message) -> str | None: # TODO добавить проверку на пустое сообщение, на минимальное
     """Process a voice message, transcribe it to text, and return the transcribed text."""
     bot = message.bot
     unix_time = int(datetime.now().timestamp())

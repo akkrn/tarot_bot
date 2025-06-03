@@ -30,7 +30,7 @@ async def main():
                 "bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
             )
         ],
-    )
+    ) # TODO вынести логи в докер volume
 
     logger.info("Starting bot")
 
