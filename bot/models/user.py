@@ -24,7 +24,8 @@ class User(Base):
     last_name: Mapped[str | None]
     real_name: Mapped[str | None]
     birth_date: Mapped[datetime.date | None]
-    balance: Mapped[int] = mapped_column(BigInteger, default=3)
+    free_attempts: Mapped[int] = mapped_column(BigInteger, default=3)
+    balance_rub: Mapped[int] = mapped_column(BigInteger, default=0)
     status: Mapped[UserStatus] = mapped_column(
         Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False
     )

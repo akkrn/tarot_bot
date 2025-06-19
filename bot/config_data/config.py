@@ -64,6 +64,11 @@ class TgBot:
 
 
 @dataclass
+class Payment:
+    provider_token: str
+
+    
+@dataclass
 class Config:
     tg_bot: TgBot
     db: DatabaseConfig
@@ -75,6 +80,8 @@ class Config:
     promt_storage: PromtStorage
     files_paths: FilesPaths
     proxy: Proxy
+    payment: Payment
+
 
 
 def load_config(path: str | None) -> Config:
@@ -113,4 +120,5 @@ def load_config(path: str | None) -> Config:
         ),
         files_paths=FilesPaths(images_path=env.str("IMAGES_PATH")),
         proxy=Proxy(path=env.str("PROXY_PATH")),
+        payment=Payment(provider_token=env.str("PROVIDER_TOKEN"))
     )

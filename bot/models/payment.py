@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import TIMESTAMP, INTEGER, TEXT, ForeignKey
+from sqlalchemy import TIMESTAMP, INTEGER, TEXT, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -17,6 +17,7 @@ class Payment(Base):
     payment_id: Mapped[str] = mapped_column(TEXT, nullable=False)
     invoice_payload: Mapped[str] = mapped_column(TEXT, nullable=False)
     total_amount: Mapped[int] = mapped_column(INTEGER, nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False)
     is_refunded: Mapped[bool] = mapped_column(default=False)
     date: Mapped[datetime.datetime] = mapped_column(
         TIMESTAMP, default=datetime.datetime.now(), nullable=False

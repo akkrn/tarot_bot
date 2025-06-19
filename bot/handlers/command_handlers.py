@@ -3,19 +3,20 @@ import base64
 import datetime
 import logging
 
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import CommandStart, StateFilter, CommandObject, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from sqlalchemy import select
 
-from constants import SHORT_SLEEP, MIDDLE_SLEEP, REFERRAL_BONUS
-from fsm_settings import StartForm, AskState
+from services.payments import build_payment_invoice
+from constants import MINIMAL_TOPUP_VALUE, SHORT_SLEEP, MIDDLE_SLEEP, REFERRAL_BONUS
+from fsm_settings import PaymentStates, StartForm, AskState
 from lexicon.lexicon import LEXICON_RU
 from loader import async_session
 from models import User
 from services.profile import get_profile_info
-from services.utils import delete_warning
+from services.utils import create_inline_kb, delete_warning
 
 
 router = Router()
@@ -57,7 +58,7 @@ async def cmd_start(
                     if referrer_user:
                         new_user.referrer_id = referrer_user.id
                         bot = message.bot
-                        referrer_user.balance += REFERRAL_BONUS
+                        referrer_user.free_attempts += REFERRAL_BONUS
                         try:
                             await bot.send_message(
                                 referrer_id, LEXICON_RU["enter_new_friend"]
@@ -113,3 +114,41 @@ async def cmd_paysupport(
     message: Message,
 ):
     await message.answer(LEXICON_RU["paysupport"])
+
+
+@router.message(Command("topup"))
+async def command_topup(message: Message, state: FSMContext):
+    keyboard = create_inline_kb(
+    2,
+    pay_100="100₽", pay_200="200₽", pay_500="500₽", pay_1000="1000₽", pay_custom="Другая сумма"
+)
+    await state.set_state(PaymentStates.choosing_amount)
+    await message.answer("Выберите сумму пополнения:", reply_markup=keyboard)
+
+
+@router.callback_query(F.data.startswith("pay_"), StateFilter(PaymentStates.choosing_amount))
+async def pay_selected_amount(callback: CallbackQuery, state: FSMContext):
+    data = callback.data
+    if data == "pay_custom":
+        await state.set_state(PaymentStates.entering_custom_amount)
+        await callback.message.edit_text(f"Введите сумму в рублях (минимум {MINIMAL_TOPUP_VALUE}):")
+    else:
+        amount = int(data.split("_")[1])
+        await build_payment_invoice(callback.bot, callback, state, currency="RUB", manual_amount=amount)
+
+
+@router.message(StateFilter(PaymentStates.entering_custom_amount))
+async def handle_custom_amount(message: Message, state: FSMContext):
+    try:
+        amount = int(message.text.strip())
+        if amount < MINIMAL_TOPUP_VALUE:
+            raise ValueError
+        class FakeCallback:
+            def __init__(self, user_id):
+                self.from_user = type("User", (), {"id": user_id})()
+                self.message = message
+        fake_cb = FakeCallback(message.from_user.id)
+        await build_payment_invoice(message.bot, fake_cb, state, currency="RUB", manual_amount=amount)
+    except ValueError:
+        await delete_warning(message, f"Введите корректное число от {MINIMAL_TOPUP_VALUE} и выше.")
+

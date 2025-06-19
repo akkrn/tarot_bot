@@ -52,6 +52,9 @@ max_tokens = int(config.promt_storage.max_tokens)
 # Files Paths
 images_path = config.files_paths.images_path
 
+# Payments Token
+payments_provider_token = config.payment.provider_token
+
 # Proxy
 proxy_path = config.proxy.path
 

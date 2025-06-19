@@ -15,3 +15,8 @@ class AskState(StatesGroup):
 
 class AdminState(StatesGroup):
     push_ads = State()
+
+class PaymentStates(StatesGroup):
+    choosing_payment_method = State()
+    choosing_amount = State()
+    entering_custom_amount = State()

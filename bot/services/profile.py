@@ -84,6 +84,8 @@ async def get_profile_info(session: AsyncSession, user_tg_id: int) -> str:
         f"Чаще всего выпадающая карта: {most_frequent_card_name}\n"
         f"Друзей приглашено: {friends_invited}\n"
         f"Вопросов задано: {questions_asked}\n"
-        f"Бесплатных вопросов: {user.balance}\n"
+        f"Бесплатных вопросов: {user.free_attempts}\n"
+        f"Баланс: {user.balance_rub} ₽\n" 
+
     )
     return response_text

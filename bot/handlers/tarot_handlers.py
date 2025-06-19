@@ -70,10 +70,10 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
             )
             try:
                 user = result.scalar_one()
-                if user.balance:
+                if user.free_attempts:
                     await callback.answer()
                     if callback.data == "one_card":
-                        balance = user.balance - 1
+                        balance = user.free_attempts - 1
                         await callback.message.delete()
                         try:
                             question_id = await start_1_tarot(
@@ -89,7 +89,7 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                             )
                             return
                     elif callback.data == "three_card":
-                        balance = user.balance - 1
+                        balance = user.free_attempts - 1
                         await callback.message.delete()
                         try:
                             question_id = await start_3_tarot(
@@ -104,7 +104,7 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                                 text=LEXICON_RU["new_question_after_error"]
                             )
                             return
-                    user.balance = balance
+                    user.free_attempts = balance
                     await session.commit()
                     await asyncio.sleep(LONG_SLEEP)
                     await state.set_state(AskState.question)
