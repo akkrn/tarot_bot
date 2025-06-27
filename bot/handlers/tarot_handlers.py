@@ -158,9 +158,3 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
         await state.set_state(AskState.question)
         await callback.message.delete()
         await callback.message.answer(text=LEXICON_RU["let_ask_question"])
-
-
-@router.callback_query(StateFilter(AskState.proccess))
-@router.message(StateFilter(AskState.proccess))
-async def procces_tarot_message(message: Message):
-    await delete_warning(message, LEXICON_RU["proccess_tarot_message"])
