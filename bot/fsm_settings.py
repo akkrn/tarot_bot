@@ -9,14 +9,15 @@ class StartForm(StatesGroup):
 class AskState(StatesGroup):
     question = State()
     choose_type = State()
-    payment = State()
     proccess = State()
 
 
 class AdminState(StatesGroup):
     push_ads = State()
 
-class PaymentStates(StatesGroup):
+
+class PaymentState(StatesGroup):
     choosing_payment_method = State()
     choosing_amount = State()
     entering_custom_amount = State()
+    payment = State()

@@ -1,43 +1,46 @@
+import logging
 from datetime import datetime
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import (
-    CallbackQuery,
-    LabeledPrice,
-)
-import logging
-
+from aiogram.types import CallbackQuery, LabeledPrice
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from constants import PRICE_1_CARD_RUB, PRICE_3_CARD_RUB
-from services.admin import send_to_admin
+
+from constants import (PRICE_1_CARD_RUB, PRICE_1_CARD_XTR, PRICE_3_CARD_RUB,
+                       PRICE_3_CARD_XTR)
 from lexicon.lexicon import LEXICON_RU
 from loader import payments_provider_token
+from services.admin import send_to_admin
 
 logger = logging.getLogger(__name__)
 
 
 async def build_payment_invoice(
-    bot: Bot, callback: CallbackQuery, state: FSMContext, currency: str = "XTR", manual_amount: int | None = None,
+    bot: Bot,
+    callback: CallbackQuery,
+    state: FSMContext,
+    currency: str = "XTR",
+    manual_amount: int | None = None,
+    payload: str | None = None,
 ) -> None:
     """Generate a payment invoice for a selected tarot card reading
     and sends it to the user with an option to pay."""
 
-    card_type = callback.data
+    card_type = callback.data if not payload else payload
     now = int(datetime.now().timestamp())
 
     card_options = {
         "one_card": {
             "title": "Расклад на 1 карту",
             "description": LEXICON_RU["description_1_card"],
-            "amount_xtr": 50,
+            "amount_xtr": PRICE_1_CARD_XTR,
             "payload": "1_card",
         },
         "three_card": {
             "title": "Расклад на 3 карты",
             "description": LEXICON_RU["description_3_card"],
-            "amount_xtr": 75,
+            "amount_xtr": PRICE_3_CARD_XTR,
             "payload": "3_card",
         },
     }
@@ -56,7 +59,7 @@ async def build_payment_invoice(
     elif currency == "RUB":
         price = manual_amount * 100
         title = "Пополнение баланса"
-        description = f"Стоимость расклада на 1 карту - {PRICE_1_CARD_RUB}руб\nНа три - {PRICE_3_CARD_RUB}руб"
+        description = f"Стоимость расклада на 1 карту - {PRICE_1_CARD_RUB}руб\n\nНа три - {PRICE_3_CARD_RUB}руб"
         currency_code = "RUB"
         provider_token = payments_provider_token
         payload = "balance_topup"
@@ -65,27 +68,27 @@ async def build_payment_invoice(
         await send_to_admin(bot, currency, callback.from_user.id)
         logger.error("Неизвестная валюта.")
         return
-    
-    builder.button(
-        text=button_text,
-        pay=True
-    )
+
+    builder.button(text=button_text, pay=True)
     builder.button(text="Назад", callback_data="cancel_payment")
     builder.adjust(1)
+    logger.info(
+        f"{callback.from_user.id},{title},{description},{[LabeledPrice(label=currency_code, amount=price)]},{provider_token},{payload},{currency_code}"
+    )
 
-
-    await bot.send_invoice(
+    invoice_message = await bot.send_invoice(
         chat_id=callback.from_user.id,
         title=title,
         description=description,
         prices=[LabeledPrice(label=currency_code, amount=price)],
         provider_token=provider_token,
-        payload= payload,
+        payload=payload,
         currency=currency_code,
         reply_markup=builder.as_markup(),
     )
-
-    await state.update_data(invoice_timestamp=now)
+    await state.update_data(
+        invoice_timestamp=now, invoice_message_id=invoice_message.message_id
+    )
 
 
 async def refund(bot: Bot, user_id: int, payment_id: str):

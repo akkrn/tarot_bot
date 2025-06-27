@@ -1,23 +1,22 @@
 import asyncio
 import logging
 
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from sqlalchemy import select
 
-from constants import LONG_SLEEP, SHORT_SLEEP
+from constants import (LONG_SLEEP, PRICE_1_CARD_RUB, PRICE_3_CARD_RUB,
+                       SHORT_SLEEP)
 from exceptions import FailedOpenAIGenerateError
-from fsm_settings import AskState
+from fsm_settings import AskState, PaymentState
 from lexicon.lexicon import LEXICON_RU
 from loader import async_session
 from models import User
 from services.audio_transcribe import prepare_voice_message
-from services.payments import build_payment_invoice
 from services.tarot import start_1_tarot, start_3_tarot
 from services.utils import create_inline_kb, delete_warning
-
 
 router = Router()
 logger = logging.getLogger(__name__)
@@ -54,6 +53,21 @@ async def process_voice_question(message: Message, state: FSMContext):
     await state.set_state(AskState.choose_type)
 
 
+def is_has_balance(user, callback):
+    if user.free_attempts > 0:
+        user.free_attempts -= 1
+        return True
+    if callback.data == "one_card":
+        if user.balance_rub >= PRICE_1_CARD_RUB:
+            user.balance_rub -= PRICE_1_CARD_RUB
+            return True
+    elif callback.data == "three_card":
+        if user.balance_rub >= PRICE_3_CARD_RUB:
+            user.balance_rub -= PRICE_3_CARD_RUB
+            return True
+    return False
+
+
 @router.callback_query(
     F.data.in_(["one_card", "three_card", "new_question"]),
     StateFilter(AskState.choose_type),
@@ -70,10 +84,9 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
             )
             try:
                 user = result.scalar_one()
-                if user.free_attempts:
+                if is_has_balance(user, callback):
                     await callback.answer()
                     if callback.data == "one_card":
-                        balance = user.free_attempts - 1
                         await callback.message.delete()
                         try:
                             question_id = await start_1_tarot(
@@ -89,7 +102,6 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                             )
                             return
                     elif callback.data == "three_card":
-                        balance = user.free_attempts - 1
                         await callback.message.delete()
                         try:
                             question_id = await start_3_tarot(
@@ -104,7 +116,6 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                                 text=LEXICON_RU["new_question_after_error"]
                             )
                             return
-                    user.free_attempts = balance
                     await session.commit()
                     await asyncio.sleep(LONG_SLEEP)
                     await state.set_state(AskState.question)
@@ -122,14 +133,25 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                     )
                     await asyncio.sleep(SHORT_SLEEP)
                     await callback.message.answer(
+                        text=LEXICON_RU["balance_after_question"].format(user.free_atempts, user.balance)
+                    )
+                    await callback.message.answer(
                         text=LEXICON_RU["ask_new_question"]
                     )
                 else:
                     await callback.answer()
-                    await state.set_state(AskState.payment)
-                    await callback.message.delete()
-                    await build_payment_invoice(bot, callback, state)
-                    return
+                    await state.update_data(payment_type=callback.data)
+
+                    keyboard = create_inline_kb(
+                        2,
+                        pay_by_stars="💫 Оплатить звездами",
+                        top_up_balance="💳 Пополнить баланс",
+                    )
+                    await callback.message.edit_text(
+                        LEXICON_RU["choose_payment_type"],
+                        reply_markup=keyboard,
+                    )
+                    await state.set_state(PaymentState.choosing_payment_method)
             except Exception as e:
                 logger.error(e)
     elif callback.data == "new_question":
