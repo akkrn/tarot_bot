@@ -25,7 +25,7 @@ async_session = sessionmaker(
 # Redis connection
 redis_password = config.redis_client.password
 redis_client = redis.Redis(
-    password=redis_password,
+    host="redis",
 )
 
 # Monitoring & Exceptions
