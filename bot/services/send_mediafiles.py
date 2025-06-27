@@ -1,14 +1,13 @@
 import asyncio
+import logging
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramAPIError
 from aiogram.types import FSInputFile, Message
-import logging
-
 from aiohttp import ClientOSError
-from services.redis import get_file_id, save_file_id, delete_file_id
 
 from exceptions import GifSendException
+from services.redis import delete_file_id, get_file_id, save_file_id
 
 logger = logging.getLogger(__name__)
 

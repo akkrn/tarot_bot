@@ -3,13 +3,8 @@ import logging
 import httpx
 from openai import AsyncOpenAI
 
-from loader import (
-    deepseek_api_key,
-    deepseek_engine,
-    user_1_card_promt,
-    user_3_card_promt,
-    max_tokens,
-)
+from loader import (deepseek_api_key, deepseek_engine, max_tokens,
+                    user_1_card_promt, user_3_card_promt)
 
 logger = logging.getLogger(__name__)
 
@@ -68,4 +63,3 @@ async def ask_deepseek(question: str, card_name: list) -> str:
 #         logger.error(
 #             f"При обработке голосового сообщения возникла ошибка: {e}"
 #         )
-

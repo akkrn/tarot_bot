@@ -1,14 +1,15 @@
 import datetime
-from typing import TYPE_CHECKING
-from sqlalchemy import BigInteger, TIMESTAMP, Enum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
+from typing import TYPE_CHECKING
+
+from sqlalchemy import TIMESTAMP, BigInteger, Enum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
 if TYPE_CHECKING:
-    from .question import Question
     from .payment import Payment
+    from .question import Question
 
 
 class UserStatus(enum.Enum):

@@ -1,13 +1,14 @@
 import asyncio
+import logging
 import re
 from datetime import datetime
-import logging
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from lexicon.lexicon import LEXICON_RU
-from exceptions import FailedParseResponseException
+
 from constants import SHORT_SLEEP
+from exceptions import FailedParseResponseException
+from lexicon.lexicon import LEXICON_RU
 
 logger = logging.getLogger(__name__)
 

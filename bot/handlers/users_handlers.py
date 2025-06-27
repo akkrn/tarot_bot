@@ -1,16 +1,13 @@
 import datetime
 
 from aiogram import F, Router
-from aiogram.filters.chat_member_updated import (
-    ChatMemberUpdatedFilter,
-    MEMBER,
-    KICKED,
-)
+from aiogram.filters.chat_member_updated import (KICKED, MEMBER,
+                                                 ChatMemberUpdatedFilter)
 from aiogram.types import ChatMemberUpdated
 from sqlalchemy import update
 
 from loader import async_session
-from models.user import UserStatus, User
+from models.user import User, UserStatus
 
 router = Router()
 router.my_chat_member.filter(F.chat.type == "private")

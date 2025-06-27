@@ -1,14 +1,14 @@
 import asyncio
 import logging
 
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy import select
 
 from filters.filters import IsValidDateFilter
-from fsm_settings import StartForm, AskState
+from fsm_settings import AskState, StartForm
 from lexicon.lexicon import LEXICON_RU
 from loader import async_session
 from models import User

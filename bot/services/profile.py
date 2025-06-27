@@ -1,10 +1,11 @@
 import logging
 
-from sqlalchemy import func, select, distinct
+from sqlalchemy import distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User, Question
-from media_data import cards_list
 from sqlalchemy.orm import aliased
+
+from media_data import cards_list
+from models import Question, User
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,6 @@ async def get_profile_info(session: AsyncSession, user_tg_id: int) -> str:
         f"Друзей приглашено: {friends_invited}\n"
         f"Вопросов задано: {questions_asked}\n"
         f"Бесплатных вопросов: {user.free_attempts}\n"
-        f"Баланс: {user.balance_rub} ₽\n" 
-
+        f"Баланс: {user.balance_rub} ₽\n"
     )
     return response_text

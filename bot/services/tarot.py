@@ -1,30 +1,27 @@
 import asyncio
 import datetime
-import random
 import logging
+import random
 import re
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.utils.chat_action import ChatActionSender
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Question, User
-#from services.openai import ask_openai
-from services.deepseek import ask_deepseek
-from services.utils import parse_response, find_or_insert_newline
-
-from services.send_mediafiles import send_file, send_gif
-from exceptions import FailedParseResponseException, GifSendException
-from loader import images_path
-
-from exceptions import FailedOpenAIGenerateError
+from constants import LONG_SLEEP, MIDDLE_SLEEP, RETRY_ATTEMPTS
+from exceptions import (FailedOpenAIGenerateError,
+                        FailedParseResponseException, GifSendException)
 from lexicon.lexicon import LEXICON_RU
-from services.utils import calculate_reading_time
-from constants import RETRY_ATTEMPTS, MIDDLE_SLEEP, LONG_SLEEP
-from media_data import gifs_dict, cards_list
-
+from loader import images_path
+from media_data import cards_list, gifs_dict
+from models import Question, User
+# from services.openai import ask_openai
+from services.deepseek import ask_deepseek
+from services.send_mediafiles import send_file, send_gif
+from services.utils import (calculate_reading_time, find_or_insert_newline,
+                            parse_response)
 logger = logging.getLogger(__name__)
 
 

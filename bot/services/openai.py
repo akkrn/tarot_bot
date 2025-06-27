@@ -1,20 +1,13 @@
 import io
+import logging
 import os
 
 import aiofiles
-import logging
-
 import httpx
 from openai import AsyncOpenAI
 
-from loader import (
-    openai_api_key,
-    openai_engine,
-    user_1_card_promt,
-    user_3_card_promt,
-    max_tokens,
-    proxy_path,
-)
+from loader import (max_tokens, openai_api_key, openai_engine, proxy_path,
+                    user_1_card_promt, user_3_card_promt)
 
 logger = logging.getLogger(__name__)
 

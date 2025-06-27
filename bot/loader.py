@@ -1,9 +1,9 @@
+import redis.asyncio as redis
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-import redis.asyncio as redis
 from aiogram.fsm.storage.redis import RedisStorage
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 from config_data.config import load_config
 
@@ -39,7 +39,7 @@ admins_ids = [int(x) for x in config.admin_rights.admins_ids]
 openai_api_key = config.openai.api_key
 openai_engine = config.openai.engine
 
-#DeepSeek Config
+# DeepSeek Config
 deepseek_api_key = config.deepseek.api_key
 deepseek_engine = config.deepseek.engine
 

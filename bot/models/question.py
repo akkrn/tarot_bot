@@ -1,6 +1,7 @@
 import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import TIMESTAMP, TEXT, ForeignKey, String
+
+from sqlalchemy import TEXT, TIMESTAMP, ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
