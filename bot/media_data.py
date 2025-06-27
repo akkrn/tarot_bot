@@ -83,7 +83,7 @@ gifs_dict = {
     "gif_magic_cards": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWRiYTRudm42NTkzMXZjdmtzMWZvZzNwY2NkOXd5cGxtM2M2bXdqciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jprXz2xFUB8yP9tdCr/giphy.gif",
     "gif_black_swing": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGgxNmNwajlnMWNpZng2cHRwNGFhdmFjZm5raDh2N2ducnVkaW54cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SrWh9peE9r1MTVr8aQ/giphy.gif",
     "gif_moon_card": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDJrNXB5YjcxOGw4eWg2Z3p1cjRta3lyamZqdTExdGxlaWZocXh0YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o6Zt85lYEswGtG2YM/giphy.gif",
-    "gif_belly_fun": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ28zNG5keXBoNDQ4dWR6cGNyM2gyeGtuamJzejlnNWw5YXVqaXpiNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6zTaXrUs1rmCY/giphy.gif",
+    # "gif_belly_fun": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ28zNG5keXBoNDQ4dWR6cGNyM2gyeGtuamJzejlnNWw5YXVqaXpiNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6zTaXrUs1rmCY/giphy.gif",
     "gif_two_cards_loading": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzk2aGZ3ZmYyajNkMnJ4MHFoa244eGZ6cDN3dW4xd2gxNGJkNHhibCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/z5cfdNGd140jVRvejU/giphy.gif",
     "gif_hands_moon": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3FzeGhnNnNqd2dxbW9zd3c5bWcwazk1ODd6amxnNTJ5ZnpwZnZpNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Ej9oJbyNCpXb43EIQo/giphy.gif",
     "gif_girl_crystal": "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXZmb3Fkbm9saWVyNGp5Z2NjM2QxZ2ZtMnVsZ3dwYmhpbHRjcW5seiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/auA7QtdqknAHjSVoFG/giphy.gif",
