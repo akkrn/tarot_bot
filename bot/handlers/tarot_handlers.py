@@ -135,7 +135,7 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                     )
                     await asyncio.sleep(SHORT_SLEEP)
                     await bot.send_message(chat_id,
-                        text=LEXICON_RU["balance_after_question"].format(user.free_atempts, user.balance)
+                        text=LEXICON_RU["balance_after_question"].format(user.free_attempts, user.balance)
                     )
                     await bot.send_message(chat_id,
                         text=LEXICON_RU["ask_new_question"]
