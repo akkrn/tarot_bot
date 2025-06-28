@@ -5,16 +5,9 @@ from logging.handlers import RotatingFileHandler
 
 import sentry_sdk
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
-
-from handlers import (
-    users_handlers,
-    payments_handlers,
-    admin_handlers,
-    other_handlers,
-    tarot_handlers,
-    form_handlers,
-    command_handlers,
-)
+from handlers import (admin_handlers, command_handlers, form_handlers,
+                      other_handlers, payments_handlers, tarot_handlers,
+                      users_handlers)
 from loader import bot, dp, sentry_url
 
 logger = logging.getLogger(__name__)
@@ -27,7 +20,10 @@ async def main():
         "[%(asctime)s] - %(name)s - %(message)s",
         handlers=[
             RotatingFileHandler(
-                "logs/bot.log", maxBytes=50000000, backupCount=5, encoding="utf-8"
+                "logs/bot.log",
+                maxBytes=50000000,
+                backupCount=5,
+                encoding="utf-8",
             )
         ],
     )

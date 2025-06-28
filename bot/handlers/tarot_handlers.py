@@ -74,9 +74,11 @@ def is_has_balance(user, callback):
 )
 async def process_choose_type(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskState.proccess)
+    await callback.answer() 
     user_data = await state.get_data()
     question = user_data["question"]
     bot = callback.bot
+    chat_id = callback.message.chat.id
     if callback.data == "one_card" or callback.data == "three_card":
         async with async_session() as session:
             result = await session.execute(
@@ -127,19 +129,18 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                             f"thumb_down_{question_id}": "👎",
                         },
                     )
-                    await callback.message.answer(
+                    await bot.send_message(chat_id,
                         text=LEXICON_RU["feedback_please"],
                         reply_markup=keyboard,
                     )
                     await asyncio.sleep(SHORT_SLEEP)
-                    await callback.message.answer(
+                    await bot.send_message(chat_id,
                         text=LEXICON_RU["balance_after_question"].format(user.free_atempts, user.balance)
                     )
-                    await callback.message.answer(
+                    await bot.send_message(chat_id,
                         text=LEXICON_RU["ask_new_question"]
                     )
                 else:
-                    await callback.answer()
                     await state.update_data(payment_type=callback.data)
 
                     keyboard = create_inline_kb(
@@ -147,7 +148,7 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                         pay_by_stars="💫 Оплатить звездами",
                         top_up_balance="💳 Пополнить баланс",
                     )
-                    await callback.message.edit_text(
+                    await bot.send_message(chat_id,
                         LEXICON_RU["choose_payment_type"],
                         reply_markup=keyboard,
                     )

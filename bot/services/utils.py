@@ -113,7 +113,7 @@ def parse_birth_date(date_str: str) -> datetime:
             continue
 
 
-def find_or_insert_newline(text: str) -> [str, str]:
+def find_or_insert_newline(text: str) -> tuple[str, str]:
     mid_index = len(text) // 2
     if "\n" in text:
         newline_indices = [i for i, char in enumerate(text) if char == "\n"]
