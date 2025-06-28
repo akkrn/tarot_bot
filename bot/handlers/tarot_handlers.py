@@ -134,6 +134,7 @@ async def process_choose_type(callback: CallbackQuery, state: FSMContext):
                         reply_markup=keyboard,
                     )
                     await asyncio.sleep(SHORT_SLEEP)
+                    
                     await bot.send_message(chat_id,
                         text=LEXICON_RU["balance_after_question"].format(user.free_attempts, user.balance_rub)
                     )
